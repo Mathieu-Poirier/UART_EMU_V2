@@ -3,7 +3,6 @@
 #include "ring_buffer.hpp"
 
 constexpr uint32_t buf_capacity = 64;
-constexpr uint32_t register_count = 8;
 
 enum class DeviceState : uint8_t {
   IDLE,
