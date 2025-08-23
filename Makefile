@@ -34,14 +34,18 @@ BUILD_DIR    := build
 BIN_DIR      := bin
 
 APP          := $(BIN_DIR)/$(PKG)
+DEMO         := $(BIN_DIR)/demo
 TESTBINS     := $(patsubst $(TEST_DIR)/%.cpp,$(BIN_DIR)/test_%,$(wildcard $(TEST_DIR)/*.cpp))
 
 SRC_CPP      := $(wildcard $(SRC_DIR)/*.cpp)
 TEST_CPP     := $(wildcard $(TEST_DIR)/*.cpp)
+DEMO_CPP     := $(wildcard demo/*.cpp)
 CRT0         := $(SRC_DIR)/crt0.S
 
 OBJ_APP      := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/freestanding/%.o,$(SRC_CPP)) \
                 $(BUILD_DIR)/freestanding/crt0.o
+OBJ_DEMO     := $(patsubst demo/%.cpp,$(BUILD_DIR)/hosted/demo/%.o,$(DEMO_CPP)) \
+                $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/hosted/%.o,$(filter-out $(SRC_DIR)/main.cpp,$(SRC_CPP)))
 OBJ_SRC_HOSTED := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/hosted/%.o,$(filter-out $(SRC_DIR)/main.cpp,$(SRC_CPP)))
 
 ##### flags #####
@@ -70,6 +74,10 @@ $(BUILD_DIR)/freestanding/crt0.o: $(CRT0) | $(BUILD_DIR)/freestanding
 $(BUILD_DIR)/freestanding/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)/freestanding
 	$(ZIGCXX) $(CXXFLAGS_COMMON) $(CXXFLAGS_FREESTANDING) -c $< -o $@
 
+##### build rules (hosted demo) #####
+$(DEMO): $(OBJ_DEMO) | $(BIN_DIR)
+	$(ZIGCXX) $(LDFLAGS_HOSTED) -o $@ $(OBJ_DEMO) $(LDLIBS_HOSTED)
+
 ##### build rules (hosted tests) #####
 $(BIN_DIR)/test_%: $(BUILD_DIR)/hosted/tests/%.o $(OBJ_SRC_HOSTED) | $(BIN_DIR)
 	$(ZIGCXX) $(LDFLAGS_HOSTED) -o $@ $< $(OBJ_SRC_HOSTED) $(LDLIBS_HOSTED)
@@ -80,11 +88,15 @@ $(BUILD_DIR)/hosted/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)/hosted
 $(BUILD_DIR)/hosted/tests/%.o: $(TEST_DIR)/%.cpp | $(BUILD_DIR)/hosted/tests
 	$(ZIGCXX) $(CXXFLAGS_COMMON) $(CXXFLAGS_HOSTED) -DTESTING=1 -c $< -o $@
 
+$(BUILD_DIR)/hosted/demo/%.o: demo/%.cpp | $(BUILD_DIR)/hosted/demo
+	$(ZIGCXX) $(CXXFLAGS_COMMON) $(CXXFLAGS_HOSTED) -DDEMO=1 -c $< -o $@
+
 ##### dirs #####
 $(BIN_DIR) \
 $(BUILD_DIR)/freestanding \
 $(BUILD_DIR)/hosted \
-$(BUILD_DIR)/hosted/tests:
+$(BUILD_DIR)/hosted/tests \
+$(BUILD_DIR)/hosted/demo:
 	mkdir -p $@
 
 ##### standard GNU user targets #####
@@ -119,6 +131,12 @@ installdirs:
 	         "$(DESTDIR)$(dvidir)" \
 	         "$(DESTDIR)$(pdfdir)" \
 	         "$(DESTDIR)$(psdir)"
+
+# demo: build & run hosted demo
+.PHONY: demo
+demo: $(DEMO)
+	@echo "== running UART emulator demo =="
+	$(DEMO)
 
 # check: build & run tests (hosted)
 .PHONY: check test
