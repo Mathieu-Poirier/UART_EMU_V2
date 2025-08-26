@@ -5,27 +5,14 @@ VERSION      ?= $(shell [ -f VERSION ] && cat VERSION || echo 0.1.0)
 ##### tools #####
 ZIGCXX       ?= zig c++
 ZIGCC        ?= zig cc
-AR           ?= ar
-RANLIB       ?= ranlib
 INSTALL      ?= install
 INSTALL_PROGRAM ?= $(INSTALL)
-INSTALL_DATA ?= $(INSTALL) -m 644
 STRIP        ?= strip
-CTAGS        ?= ctags
-SHELL        ?= /bin/sh
 
 ##### install dirs (GNU) #####
 prefix       ?= /usr/local
 exec_prefix  ?= $(prefix)
 bindir       ?= $(exec_prefix)/bin
-libdir       ?= $(exec_prefix)/lib
-datadir      ?= $(prefix)/share
-infodir      ?= $(datadir)/info
-mandir       ?= $(datadir)/man
-htmldir      ?= $(datadir)/doc/$(PKG)/html
-dvidir       ?= $(datadir)/doc/$(PKG)/dvi
-pdfdir       ?= $(datadir)/doc/$(PKG)/pdf
-psdir        ?= $(datadir)/doc/$(PKG)/ps
 
 ##### layout #####
 SRC_DIR      := src
@@ -99,14 +86,12 @@ $(BUILD_DIR)/hosted/tests \
 $(BUILD_DIR)/hosted/demo:
 	mkdir -p $@
 
-##### standard GNU user targets #####
+##### standard targets #####
 
 # install: do not strip; create dirs; avoid modifying build tree
 .PHONY: install
 install: all installdirs
 	$(INSTALL_PROGRAM) -m 755 $(APP) "$(DESTDIR)$(bindir)/$(PKG)"
-	@# simple smoke check if desired (freestanding binaries may not run on host)
-	@true
 
 # install-strip: like install, but strip installed copy
 .PHONY: install-strip
@@ -122,15 +107,7 @@ uninstall:
 # installdirs: create all install dirs (DESTDIR-aware)
 .PHONY: installdirs
 installdirs:
-	mkdir -p "$(DESTDIR)$(bindir)" \
-	         "$(DESTDIR)$(datadir)" \
-	         "$(DESTDIR)$(libdir)" \
-	         "$(DESTDIR)$(infodir)" \
-	         "$(DESTDIR)$(mandir)" \
-	         "$(DESTDIR)$(htmldir)" \
-	         "$(DESTDIR)$(dvidir)" \
-	         "$(DESTDIR)$(pdfdir)" \
-	         "$(DESTDIR)$(psdir)"
+	mkdir -p "$(DESTDIR)$(bindir)"
 
 # demo: build & run hosted demo
 .PHONY: demo
@@ -149,94 +126,7 @@ test: $(TESTBINS)
 	done
 	@echo "All tests completed successfully!"
 
-# installcheck: tests that require installed files (optional)
-.PHONY: installcheck
-installcheck:
-	@echo "No installcheck defined." && true
-
-# clean tiers
-.PHONY: clean mostlyclean distclean maintainer-clean
+# clean
+.PHONY: clean
 clean:
 	-rm -rf $(BUILD_DIR) $(BIN_DIR) .cache
-
-mostlyclean:
-	@$(MAKE) clean
-
-distclean:
-	@$(MAKE) clean
-	-rm -f config.log config.status Makefile.config
-
-maintainer-clean:
-	@echo 'This command is intended for maintainers to use; it'
-	@echo 'deletes files that may need special tools to rebuild.'
-	@$(MAKE) distclean
-	-rm -f TAGS
-	-rm -rf dist
-
-# TAGS (ctags)
-.PHONY: TAGS
-TAGS:
-	$(CTAGS) -R --languages=C,C++ $(SRC_DIR) $(TEST_DIR) 2>/dev/null || true
-
-##### docs (no-ops unless you add Texinfo) #####
-MAKEINFO   ?= makeinfo
-TEXI2DVI   ?= texi2dvi
-TEXI2HTML  ?= makeinfo --no-split --html
-
-DOC_TEXI   ?=
-
-.PHONY: info dvi html pdf ps
-info:
-	@if [ -n "$(DOC_TEXI)" ]; then \
-	  $(MAKEINFO) $(DOC_TEXI); \
-	else echo "No Texinfo docs."; fi
-
-dvi:
-	@if [ -n "$(DOC_TEXI)" ]; then \
-	  $(TEXI2DVI) $(DOC_TEXI); \
-	else echo "No Texinfo docs."; fi
-
-html:
-	@if [ -n "$(DOC_TEXI)" ]; then \
-	  $(TEXI2HTML) $(DOC_TEXI); \
-	else echo "No Texinfo docs."; fi
-
-pdf:
-	@if [ -n "$(DOC_TEXI)" ]; then \
-	  $(MAKEINFO) --pdf $(DOC_TEXI); \
-	else echo "No Texinfo docs."; fi
-
-ps:
-	@echo "PS doc generation not configured."; true
-
-# install-*doc targets (optional; call explicitly)
-.PHONY: install-html install-dvi install-pdf install-ps
-install-html: html installdirs
-	@if ls *.html >/dev/null 2>&1; then \
-	  $(INSTALL_DATA) *.html "$(DESTDIR)$(htmldir)"; \
-	else echo "No HTML to install."; fi
-
-install-dvi: dvi installdirs
-	@if ls *.dvi >/dev/null 2>&1; then \
-	  $(INSTALL_DATA) *.dvi "$(DESTDIR)$(dvidir)"; \
-	else echo "No DVI to install."; fi
-
-install-pdf: pdf installdirs
-	@if ls *.pdf >/dev/null 2>&1; then \
-	  $(INSTALL_DATA) *.pdf "$(DESTDIR)$(pdfdir)"; \
-	else echo "No PDF to install."; fi
-
-install-ps: ps installdirs
-	@if ls *.ps  >/dev/null 2>&1; then \
-	  $(INSTALL_DATA) *.ps  "$(DESTDIR)$(psdir)"; \
-	else echo "No PS to install."; fi
-
-##### release tarball #####
-DISTDIR := dist/$(PKG)-$(VERSION)
-
-.PHONY: dist
-dist: clean
-	mkdir -p "$(DISTDIR)"
-	cp -a $(SRC_DIR) $(TEST_DIR) Makefile LICENSE README* VERSION 2>/dev/null "$(DISTDIR)" || true
-	( cd dist && tar -czf "$(PKG)-$(VERSION).tar.gz" "$(PKG)-$(VERSION)" )
-	@echo "Created dist/$(PKG)-$(VERSION).tar.gz"
