@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "ring_buffer.hpp"
 
-constexpr uint32_t buf_capacity = 64;
+constexpr uint32_t buf_capacity_large = 512;
 
 enum class DeviceState : uint8_t {
   IDLE,
@@ -40,10 +40,9 @@ struct UART_CONFIG {
 struct UART_DEVICE {
   DeviceState state = DeviceState::IDLE;
 
-  ring_buffer<uint8_t,64> tx_buf = {};
-  ring_buffer<uint8_t,64> rx_buf = {};
-  ring_buffer<uint8_t,64>* tx_serial_connection = nullptr;
-  uint32_t registers[8] = {};
+  ring_buffer<uint8_t, buf_capacity_large> tx_buf = {};
+  ring_buffer<uint8_t, buf_capacity_large> rx_buf = {};
+  ring_buffer<uint8_t, buf_capacity_large>* tx_serial_connection = nullptr;
   UART_CONFIG config;
   uint32_t bits_per_frame = 0;  // Initialize to 0
   double time_per_byte = 0.0;   // Initialize to 0

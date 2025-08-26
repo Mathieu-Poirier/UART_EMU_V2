@@ -20,13 +20,11 @@ bool push_tx_buf(UART_DEVICE &dev, uint8_t value) {
 }
 
 bool send_bit(UART_DEVICE &dev, const uint8_t value) {
-  if (dev.tx_serial_connection->push(value)) {
-    return 0;
-    }
-  else {
-        return 1;
-    }
-  return 1;
+  if (dev.tx_serial_connection != nullptr && dev.tx_serial_connection->push(value)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void serial_connection(UART_DEVICE &dev, UART_DEVICE &other) {
