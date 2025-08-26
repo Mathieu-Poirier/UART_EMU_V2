@@ -49,7 +49,7 @@ OBJ_DEMO     := $(patsubst demo/%.cpp,$(BUILD_DIR)/hosted/demo/%.o,$(DEMO_CPP)) 
 OBJ_SRC_HOSTED := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/hosted/%.o,$(filter-out $(SRC_DIR)/main.cpp,$(SRC_CPP)))
 
 ##### flags #####
-CXXFLAGS_COMMON := -std=c++20 -Wall -Wextra -O0 -g -ffunction-sections -fdata-sections
+CXXFLAGS_COMMON := -std=c++20 -Wall -Wextra -O3 -g -ffunction-sections -fdata-sections
 CXXFLAGS_FREESTANDING := -ffreestanding -fno-exceptions -fno-rtti -fno-builtin -fno-stack-protector \
                          -fno-asynchronous-unwind-tables -fno-plt -Wno-main
 ASFLAGS_FREESTANDING  := -ffreestanding -nostdlib
