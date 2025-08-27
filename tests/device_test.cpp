@@ -1,5 +1,9 @@
+#include <cstdint>
 #include <iostream>
 #include <cstdlib>
+#include <string>
+#include <memory>
+#include <bitset>
 
 #include "../src/device.hpp"
 
@@ -8,9 +12,8 @@ constexpr uint8_t stop_bit = 0x01; // high line
 
 constexpr uint32_t discrete_time_step = 1;
 
-static void load_bit_array_tx(UART_DEVICE &dev, uint8_t *bit_arr) {
-  uint32_t data_size = dev.config.data_bits;
-  for (uint32_t binary_iterator = 0; binary_iterator < data_size; binary_iterator++) {
+static void load_bit_array_tx(UART_DEVICE &dev, const uint8_t *bit_arr, uint32_t size) {
+  for (uint32_t binary_iterator = 0; binary_iterator < size; binary_iterator++) {
    dev.tx_buf.push(bit_arr[binary_iterator]);
   }
 }
@@ -91,14 +94,99 @@ static void handle_transmit(UART_DEVICE &dev) {
   }
 }
 
+static std::unique_ptr<uint8_t[]> string_to_bits(std::string str_in) { // Allocates memory
+  uint32_t bit_arr_size = str_in.size() * 8;
+  std::unique_ptr<uint8_t[]> bit_arr_ptr =
+      std::make_unique<uint8_t[]>(bit_arr_size);
+  uint32_t arr_idx = 0;
+
+  for (uint8_t character : str_in) {
+    for (int i = 7; i >= 0; --i) {
+        uint8_t bit = (character >> i) & 0b00000001;
+        bit_arr_ptr[arr_idx] = bit;
+        arr_idx++;
+    }
+  }
+  // Caller must remember size
+  return bit_arr_ptr;
+}
+
 bool multi_byte_transmission(UART_DEVICE &dev, UART_DEVICE &other) {
-  bool test_passed = false;
-  
-  
+  int simulation_time = 100000;
+  bool test_passed = true;
+
+  std::string send_string("Hello World");
+  std::unique_ptr<uint8_t[]> bit_arr = string_to_bits(send_string);
+
+  load_bit_array_tx(dev, bit_arr.get(), send_string.size() * 8);
+  uint32_t sent = 0;
+  uint8_t reconstructed_arr[11] = {};
+  uint8_t reconstructed_arr_two[11] = {};
+
+  // for (int i = 0; i < send_string.size() * 8; i++) {
+  //   uint8_t tmp = 0;
+  //   dev.tx_buf.pop(tmp);
+  //   std::cout << static_cast<unsigned int>(tmp) << std::endl;
+  // }
+
+  while (simulation_time > 0 && sent != 11) {
+    // Main loop here
+    if (is_ready(dev)) {
+      reset_clock(dev);
+      transition_uart_state(dev);
+
+      //
+      handle_transmit(dev);
+
+    }
+    if (is_ready(other)) {
+      reset_clock(other);
+      transition_uart_state(other);
+
+      handle_transmit(other);
+      handle_receive(other, reconstructed_arr[sent]);
+      sent++;
+    }
+
+
+    tick_down(dev);
+    tick_down(other);
+    simulation_time -= discrete_time_step;
+  }
+
+  for (int i = 0; i < 11; i++) {
+    // std::cout << static_cast<unsigned int>(reconstructed_arr[i]) << std::endl;
+    std::cout << static_cast<unsigned char>(reconstructed_arr[i]) << std::endl;
+    std::cout << send_string.at(i) << std::endl;
+
+    if (static_cast<unsigned char>(reconstructed_arr[i]) != send_string.at(i))
+      test_passed = false;
+  }
+
   return test_passed;
 }
 
 int main() {
+
+  constexpr UART_CONFIG default_config = {.baud_rate = 9600,
+    .data_bits = 8,
+    .stop_bits = 1,
+    .start_bits = 1, };
+
+  UART_DEVICE uart_one = {.state = DeviceState::IDLE, .config = default_config};
+  UART_DEVICE uart_two = {.state = DeviceState::IDLE, .config = default_config};
+
+  // Calculate timing after config is set
+  uart_one.calculate_timing();
+  uart_two.calculate_timing();
+
+  serial_connection(uart_one, uart_two);
+
+  if (multi_byte_transmission(uart_one, uart_two)) {
+    std::cout << "OK: Multi-Byte Transmission." << std::endl;
+  } else {
+    std::cout << "Err: Multi-Byte Transmission." << std::endl;
+  }
   
   return EXIT_SUCCESS;
 }
