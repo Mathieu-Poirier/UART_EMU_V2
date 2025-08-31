@@ -19,6 +19,7 @@ SRC_DIR      := src
 TEST_DIR     := tests
 BUILD_DIR    := build
 BIN_DIR      := bin
+IMGUI_DIR    := imgui
 
 APP          := $(BIN_DIR)/$(PKG)
 DEMO         := $(BIN_DIR)/demo
@@ -31,9 +32,21 @@ CRT0         := $(SRC_DIR)/crt0.S
 
 OBJ_APP      := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/freestanding/%.o,$(SRC_CPP)) \
                 $(BUILD_DIR)/freestanding/crt0.o
-OBJ_DEMO     := $(patsubst demo/%.cpp,$(BUILD_DIR)/hosted/demo/%.o,$(DEMO_CPP)) \
-                $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/hosted/%.o,$(filter-out $(SRC_DIR)/main.cpp,$(SRC_CPP)))
+
 OBJ_SRC_HOSTED := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/hosted/%.o,$(filter-out $(SRC_DIR)/main.cpp,$(SRC_CPP)))
+
+# Dear ImGui sources
+IMGUI_SRC    := $(IMGUI_DIR)/imgui.cpp \
+                $(IMGUI_DIR)/imgui_draw.cpp \
+                $(IMGUI_DIR)/imgui_tables.cpp \
+                $(IMGUI_DIR)/imgui_widgets.cpp \
+                $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp \
+                $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
+
+OBJ_IMGUI    := $(patsubst $(IMGUI_DIR)/%.cpp,$(BUILD_DIR)/hosted/imgui/%.o,$(IMGUI_SRC))
+
+OBJ_DEMO     := $(patsubst demo/%.cpp,$(BUILD_DIR)/hosted/demo/%.o,$(DEMO_CPP)) \
+                $(OBJ_SRC_HOSTED) $(OBJ_IMGUI)
 
 ##### flags #####
 CXXFLAGS_COMMON := -std=c++20 -Wall -Wextra -O3 -g -ffunction-sections -fdata-sections
@@ -43,9 +56,9 @@ ASFLAGS_FREESTANDING  := -ffreestanding -nostdlib
 LDFLAGS_FREESTANDING  := -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none
 LDLIBS_FREESTANDING   :=
 
-CXXFLAGS_HOSTED := -g
+CXXFLAGS_HOSTED := -g -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 LDFLAGS_HOSTED  :=
-LDLIBS_HOSTED   :=
+LDLIBS_HOSTED   := -lglfw -lGL -ldl -lpthread
 
 ##### default #####
 .PHONY: all
@@ -78,12 +91,17 @@ $(BUILD_DIR)/hosted/tests/%.o: $(TEST_DIR)/%.cpp | $(BUILD_DIR)/hosted/tests
 $(BUILD_DIR)/hosted/demo/%.o: demo/%.cpp | $(BUILD_DIR)/hosted/demo
 	$(ZIGCXX) $(CXXFLAGS_COMMON) $(CXXFLAGS_HOSTED) -DDEMO=1 -c $< -o $@
 
+$(BUILD_DIR)/hosted/imgui/%.o: $(IMGUI_DIR)/%.cpp | $(BUILD_DIR)/hosted/imgui $(BUILD_DIR)/hosted/imgui/backends
+	$(ZIGCXX) $(CXXFLAGS_COMMON) $(CXXFLAGS_HOSTED) -c $< -o $@
+
 ##### dirs #####
 $(BIN_DIR) \
 $(BUILD_DIR)/freestanding \
 $(BUILD_DIR)/hosted \
 $(BUILD_DIR)/hosted/tests \
-$(BUILD_DIR)/hosted/demo:
+$(BUILD_DIR)/hosted/demo \
+$(BUILD_DIR)/hosted/imgui \
+$(BUILD_DIR)/hosted/imgui/backends:
 	mkdir -p $@
 
 ##### standard targets #####
@@ -112,8 +130,8 @@ installdirs:
 # demo: build & run hosted demo
 .PHONY: demo
 demo: $(DEMO)
-	@echo "== running UART emulator demo =="
-	$(DEMO)
+	@echo "== running ImGui demo =="
+	GDK_BACKEND=x11 $(DEMO)
 
 # check: build & run tests (hosted)
 .PHONY: check test
