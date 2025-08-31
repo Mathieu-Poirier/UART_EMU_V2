@@ -9,13 +9,13 @@ WINDOWS_ZIP="UART_Emulator_Demo-${VERSION}-Windows-x64.zip"
 echo "Creating Windows Release for ${RELEASE_NAME}..."
 
 # Check if we're in the right directory
-if [ ! -f "../Makefile" ]; then
-    echo "❌ Please run this script from the release/ directory"
+if [ ! -f "../../Makefile" ]; then
+    echo "❌ Please run this script from the release/windows/ directory"
     exit 1
 fi
 
 # Change to parent directory
-cd ..
+cd ../..
 
 # Build Windows demo
 echo "Building Windows demo..."

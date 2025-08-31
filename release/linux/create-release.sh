@@ -17,7 +17,7 @@ if [ ! -f "$APPIMAGE_FILE" ]; then
 fi
 
 # Change to parent directory for git operations
-cd ..
+cd ../..
 
 # Check if gh CLI is installed
 if ! command -v gh >/dev/null 2>&1; then

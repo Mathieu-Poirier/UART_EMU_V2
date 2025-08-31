@@ -5,10 +5,10 @@ echo "Building UART Emulator Demo AppImage..."
 
 # Build the demo
 echo "Building demo application..."
-cd ..
+cd ../..
 make clean
 make demo
-cd release
+cd release/linux
 
 # Create AppDir
 echo "Creating AppDir structure..."
@@ -19,7 +19,7 @@ mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
 
 # Copy binary
 echo "Copying binary..."
-cp ../bin/demo AppDir/usr/bin/uart-emu-demo
+cp ../../bin/demo AppDir/usr/bin/uart-emu-demo
 
 # Create desktop entry
 echo "Creating desktop entry..."
