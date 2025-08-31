@@ -47,3 +47,8 @@ bin/*
 # AppImage build artifacts
 AppDir/
 squashfs-root/
+release/AppDir/
+release/squashfs-root/
+
+# Third-party libraries
+imgui/
