@@ -3,15 +3,9 @@
 #include <cstdint>
 #include <stdint.h>
 
-// Need to think how to unpack and pack bytes across transmission from "bits",
-// might drop parity
-// might drop endianness
-
 // Since it's async each device needs a clock object when rx sees low it means
 // it starts reiceiving data then checks if there is a stop bit then waits for
 // low
-// we need to proper initialize and reset the buffer when full to a high singal
-// 
 constexpr uint8_t start_bit = 0x00; // low line
 constexpr uint8_t stop_bit = 0x01; // high line
 
@@ -100,7 +94,6 @@ static void handle_transmit(UART_DEVICE &dev) {
   }
 }
 
-
 extern "C" int main() {
   constexpr UART_CONFIG default_config = {.baud_rate = 9600,
                         .data_bits = 8,
@@ -116,18 +109,11 @@ extern "C" int main() {
   
   serial_connection(uart_one, uart_two);
 
-  uint32_t simulation_time = 100000000;
+  uint32_t simulation_time = 100000;
 
   // This should be a data register
   uint8_t reconstructed_character = 0x00;
   uint8_t reconstructed_character_two = 0x00;
-
-  // Need to make a load function
-  uint8_t bit_arr[8] = {0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
-  uint8_t bit_arr2[8] = {0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00};
-
-  load_bit_array_tx(uart_one, bit_arr);
-  load_bit_array_tx(uart_two, bit_arr2);
 
   // Need to make helper functions for readability
   while (simulation_time > 0) {
@@ -136,9 +122,7 @@ extern "C" int main() {
       reset_clock(uart_one);
       transition_uart_state(uart_one);
 
-      //
       handle_transmit(uart_one);
-      //
       handle_receive(uart_one, reconstructed_character);
     }
     if (is_ready(uart_two)) {
@@ -148,7 +132,6 @@ extern "C" int main() {
       handle_transmit(uart_two);
       handle_receive(uart_two, reconstructed_character_two);
     }
-
 
     tick_down(uart_one);
     tick_down(uart_two);
