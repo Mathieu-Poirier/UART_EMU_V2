@@ -52,3 +52,7 @@ release/squashfs-root/
 
 # Third-party libraries
 imgui/
+
+# Windows build artifacts
+dist/
+*.exe
