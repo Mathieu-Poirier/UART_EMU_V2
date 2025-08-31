@@ -1,2 +1,6 @@
 # UART_EMU_V2
-Second attempt at creating a C++ UART emulator
+
+## Description
+Simulation of a genereic UART hardware chip in C++.
+
+
