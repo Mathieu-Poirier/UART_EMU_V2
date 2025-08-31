@@ -49,6 +49,7 @@ AppDir/
 squashfs-root/
 release/AppDir/
 release/squashfs-root/
+release/dist/
 
 # Third-party libraries
 imgui/
@@ -56,3 +57,4 @@ imgui/
 # Windows build artifacts
 dist/
 *.exe
+*.zip
