@@ -1,0 +1,59 @@
+version: 1
+script:
+  # Install system dependencies
+  - apt-get update
+  - apt-get install -y build-essential cmake pkg-config
+  - apt-get install -y libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
+  - apt-get install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+
+AppDir:
+  path: ./AppDir
+  app_info:
+    id: com.github.uart-emu-demo
+    name: UART Emulator Demo
+    icon: uart-emu-demo
+    version: 0.1.0
+    exec: usr/bin/uart-emu-demo
+    exec_args: $APPDIR/usr/bin/uart-emu-demo
+    categories:
+      - Development
+      - Education
+
+  apt:
+    arch: amd64
+    sources:
+      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse'
+        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32'
+    include:
+      - libglfw3
+      - libgl1
+      - libglu1
+      - libxrandr2
+      - libxinerama1
+      - libxcursor1
+      - libxi6
+      - libx11-6
+      - libxext6
+      - libxrender1
+      - libxss1
+      - libxfixes3
+
+  files:
+    include:
+      - /usr/lib/x86_64-linux-gnu/libglfw.so*
+      - /usr/lib/x86_64-linux-gnu/libGL.so*
+      - /usr/lib/x86_64-linux-gnu/libGLU.so*
+      - /usr/lib/x86_64-linux-gnu/libX*.so*
+      - /usr/lib/x86_64-linux-gnu/libdrm.so*
+      - /usr/lib/x86_64-linux-gnu/libgbm.so*
+      - /usr/lib/x86_64-linux-gnu/libwayland-*.so*
+      - /usr/lib/x86_64-linux-gnu/libxcb*.so*
+
+  runtime:
+    env:
+      LD_LIBRARY_PATH: $APPDIR/usr/lib:$LD_LIBRARY_PATH
+
+AppImage:
+  arch: x86_64
+  update-information: None
+  sign-key: None

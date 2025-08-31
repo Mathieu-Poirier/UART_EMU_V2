@@ -127,11 +127,10 @@ uninstall:
 installdirs:
 	mkdir -p "$(DESTDIR)$(bindir)"
 
-# demo: build & run hosted demo
+# demo: build hosted demo
 .PHONY: demo
 demo: $(DEMO)
-	@echo "== running ImGui demo =="
-	GDK_BACKEND=x11 $(DEMO)
+	@echo "== demo built successfully =="
 
 # check: build & run tests (hosted)
 .PHONY: check test

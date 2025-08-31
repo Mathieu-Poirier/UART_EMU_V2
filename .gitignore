@@ -43,3 +43,7 @@
 bin/*
 
 *.ini
+
+# AppImage build artifacts
+AppDir/
+squashfs-root/
