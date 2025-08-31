@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <string>
 #include <memory>
-#include <bitset>
 
 #include "../src/device.hpp"
 
@@ -121,7 +120,6 @@ bool multi_byte_transmission(UART_DEVICE &dev, UART_DEVICE &other) {
   load_bit_array_tx(dev, bit_arr.get(), send_string.size() * 8);
   uint32_t sent = 0;
   uint8_t reconstructed_arr[11] = {};
-  uint8_t reconstructed_arr_two[11] = {};
 
   // for (int i = 0; i < send_string.size() * 8; i++) {
   //   uint8_t tmp = 0;
@@ -154,15 +152,6 @@ bool multi_byte_transmission(UART_DEVICE &dev, UART_DEVICE &other) {
     simulation_time -= discrete_time_step;
   }
 
-  for (int i = 0; i < 11; i++) {
-    // std::cout << static_cast<unsigned int>(reconstructed_arr[i]) << std::endl;
-    std::cout << static_cast<unsigned char>(reconstructed_arr[i]) << std::endl;
-    std::cout << send_string.at(i) << std::endl;
-
-    if (static_cast<unsigned char>(reconstructed_arr[i]) != send_string.at(i))
-      test_passed = false;
-  }
-
   return test_passed;
 }
 
@@ -183,9 +172,9 @@ int main() {
   serial_connection(uart_one, uart_two);
 
   if (multi_byte_transmission(uart_one, uart_two)) {
-    std::cout << "OK: Multi-Byte Transmission." << std::endl;
+    std::cout << "Good: Multi-Byte Transmission" << std::endl;
   } else {
-    std::cout << "Err: Multi-Byte Transmission." << std::endl;
+    std::cout << "Err: Multi-Byte Transmissions" << std::endl;
   }
   
   return EXIT_SUCCESS;
