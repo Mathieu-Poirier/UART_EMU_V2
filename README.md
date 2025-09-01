@@ -141,7 +141,7 @@ source ~/.bashrc
 
 **Note**: Zig is optional! GCC is the default compiler and will be used automatically.
 
-### **Step 4: Download Your Project**
+### **Step 4: Download The Project**
 ```bash
 # Go to your Desktop folder
 cd ~/Desktop
