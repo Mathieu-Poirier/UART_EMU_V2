@@ -74,8 +74,14 @@
  
              for (uint32_t i = 0; i < dev.config.data_bits; i++) {
                  uint8_t bit;
-                 dev.rx_buf.pop(bit);
-                 reconstructed_character = (reconstructed_character << 1) | bit;
+                 if (dev.rx_buf.pop(bit)) {
+                     reconstructed_character = (reconstructed_character << 1) | bit;
+                 } else {
+                     // Buffer underrun - invalid frame
+                     dev.rx_buf.reset();
+                     dev.state = DeviceState::IDLE;
+                     return false;
+                 }
              }
  
              uint8_t message_end;
@@ -102,10 +108,15 @@
      if (dev.state == DeviceState::TRANSMITTING || dev.state == DeviceState::RECEIVING_AND_TRANSMITTING) {
          send_bit(dev, start_bit);
  
-         uint8_t send_value;
          for (uint32_t i = 0; i < dev.config.data_bits; i++) {
-             dev.tx_buf.pop(send_value);
-             send_bit(dev, send_value);
+             uint8_t send_value;
+             if (dev.tx_buf.pop(send_value)) {
+                 send_bit(dev, send_value);
+             } else {
+                 // Buffer underrun - invalid frame
+                 dev.state = DeviceState::IDLE;
+                 return;
+             }
          }
  
          send_bit(dev, stop_bit);
