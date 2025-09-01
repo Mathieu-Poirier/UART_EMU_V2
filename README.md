@@ -25,7 +25,7 @@ Initially I wanted to take an OOP focused approach to build this device simulati
 
 ## Project Structure
 
-```
+
 UART_EMU_V2/
 ├── src/ # Core source files
 │ ├── main.cpp # Freestanding entry point
@@ -57,7 +57,7 @@ UART_EMU_V2/
 ├── VERSION # Project version
 ├── .gitignore # Git ignore rules
 └── imgui.ini # ImGui configuration
-```
+
 
 ## How To Build: Linux
 
