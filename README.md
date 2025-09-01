@@ -2,7 +2,7 @@
 
 ## UART Simulation (C++ / Dear ImGUI Demo)
 
-My UART device simulation project including a freestanding build and an ImGui demo simulating two UART devices. Developed on Linux with C++ and Make. Packaged in an AppImage for Linux with Windows build instructions and WSL support.
+My UART device simulation project including a freestanding build and an ImGui demo simulating two UART devices. Developed on Linux with C++ and Make. Packaged in an AppImage for Linux.
 
 ## Project Story
 
@@ -28,9 +28,4 @@ Initially I wanted to take an OOP focused approach to build this device simulati
 
 
 ## How To Build: Linux
-
-## How To Build: Windows
-
-
-
 

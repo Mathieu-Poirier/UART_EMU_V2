@@ -9,9 +9,7 @@ INSTALL      ?= install
 INSTALL_PROGRAM ?= $(INSTALL)
 STRIP        ?= strip
 
-# Windows cross-compilation tools
-ZIGCXX_WINDOWS ?= zig c++ -target x86_64-windows-gnu
-ZIGCC_WINDOWS  ?= zig cc -target x86_64-windows-gnu
+
 
 ##### install dirs (GNU) #####
 prefix       ?= /usr/local
@@ -64,10 +62,7 @@ CXXFLAGS_HOSTED := -g -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 LDFLAGS_HOSTED  :=
 LDLIBS_HOSTED   := -lglfw -lGL -ldl -lpthread
 
-# Windows-specific flags
-CXXFLAGS_HOSTED_WINDOWS := -g -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
-LDFLAGS_HOSTED_WINDOWS  :=
-LDLIBS_HOSTED_WINDOWS   := -lglfw -lopengl32 -lgdi32 -luser32 -lkernel32 -lwinmm
+
 
 ##### default #####
 .PHONY: all
@@ -87,9 +82,7 @@ $(BUILD_DIR)/freestanding/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)/freestanding
 $(DEMO): $(OBJ_DEMO) | $(BIN_DIR)
 	$(ZIGCXX) $(LDFLAGS_HOSTED) -o $@ $(OBJ_DEMO) $(LDLIBS_HOSTED)
 
-##### build rules (hosted demo - Windows) #####
-$(BIN_DIR)/uart-demo.exe: $(OBJ_DEMO) | $(BIN_DIR)
-	$(ZIGCXX_WINDOWS) $(LDFLAGS_HOSTED_WINDOWS) -o $@ $(OBJ_DEMO) $(LDLIBS_HOSTED_WINDOWS)
+
 
 ##### build rules (hosted tests) #####
 $(BIN_DIR)/test_%: $(BUILD_DIR)/hosted/tests/%.o $(OBJ_SRC_HOSTED) | $(BIN_DIR)
@@ -145,10 +138,7 @@ installdirs:
 demo: $(DEMO)
 	@echo "== demo built successfully =="
 
-# demo-windows: build hosted demo for Windows
-.PHONY: demo-windows
-demo-windows: $(BIN_DIR)/uart-demo.exe
-	@echo "== Windows demo built successfully =="
+
 
 # check: build & run tests (hosted)
 .PHONY: check test
