@@ -277,6 +277,6 @@ make dependencies  # Installs all required packages
 Since the beginning of the project I applied the Kanban project management methodology. The core components were made in a two week time frame and had a strict Aug 30th 2025 deadline.
 I quickly realized that I had enough time to create the core systems for what I wanted to demo but had to drop some initial ideas.
 
-[Initial Kanban image](repo_assets/InitialKanbanV2.png)
+![Initial Kanban image](repo_assets/InitialKanbanV2.png)
 
-[Finished Kanban image](repo_assets/FinishedKanbanV2.png)
+![Finished Kanban image](repo_assets/FinishedKanbanV2.png)
