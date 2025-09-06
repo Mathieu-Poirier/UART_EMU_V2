@@ -256,3 +256,5 @@ make clean         # Clean build files
 # Install system dependencies (Debian/Ubuntu only)
 make dependencies  # Installs all required packages
 ```
+
+## Project Management
