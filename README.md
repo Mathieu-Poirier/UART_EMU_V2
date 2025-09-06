@@ -10,6 +10,7 @@ My UART device simulation project including a freestanding build and an ImGui de
 - [Project Features](#project-features)
 - [Messaging Through UART Demo](#messaging-through-uart-demo)
 - [Project Structure](#project-structure)
+- [Running Tests with Make](#running-tests-with-make)
 - [How To Build: Linux](#how-to-build-linux)
   - [System Tools](#system-tools)
   - [System Libraries (Required for Demo)](#system-libraries-required-for-demo)
@@ -73,6 +74,40 @@ UART_EMU_V2/
 ├── .gitignore # Git ignore rules
 └── imgui.ini # ImGui configuration
 ```
+
+## Running Tests with Make
+
+The project includes comprehensive unit tests to verify the underlying ring buffer data structure and integration tests for the UART functionality and baud rate mismatch detection.
+
+### Quick Test Commands
+
+```bash
+# Run all tests
+make check
+
+```
+
+### Test Coverage
+
+The test suite includes:
+
+- **Device Tests** (`tests/device_test.cpp`):
+  - Multi-byte transmission validation
+  - Baud rate mismatch detection
+  - Buffer overflow testing
+
+- **Ring Buffer Tests** (`tests/ring_buffer_test.cpp`):
+  - Basic push/pop operations
+  - Buffer wraparound behavior
+  - Different data types support
+  - Edge case handling
+
+### Testing Definitions
+
+- **"Good:"** - Test passed successfully
+- **"Err:"** - Test failed (indicates a problem)
+- **Mismatched Baud Rate Test** - Verifies that different baud rates cause transmission issues
+- **Message completion rate** - Shows percentage of original message successfully received
 
 ## How To Build: Linux
 
