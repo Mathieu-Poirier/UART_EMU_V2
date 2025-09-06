@@ -4,6 +4,21 @@
 
 My UART device simulation project including a freestanding build and an ImGui demo simulating two UART devices. Developed on Linux with C++ and Make. Packaged in an AppImage for Linux.
 
+## Table of Contents
+
+- [Project Story](#project-story)
+- [Project Features](#project-features)
+- [Messaging Through UART Demo](#messaging-through-uart-demo)
+- [Project Structure](#project-structure)
+- [How To Build: Linux](#how-to-build-linux)
+  - [System Tools](#system-tools)
+  - [System Libraries (Required for Demo)](#system-libraries-required-for-demo)
+  - [Compiler Options](#compiler-options)
+  - [Complete Step-by-Step Build Guide](#complete-step-by-step-build-guide)
+  - [Troubleshooting Common Issues](#troubleshooting-common-issues)
+  - [Alternative: Quick Commands for Experienced Users](#alternative-quick-commands-for-experienced-users)
+- [Project Management](#project-management)
+
 ## Project Story
 
 Initially I wanted to take an OOP focused approach to build this device simulation but I ended up abusing abstraction principles and I couldn't keep the scope of the design contained. I focused on the procedural aspect of the code and the hard problems to solve such as: baud and clock timing, easily converting strings to bits, the connection of devices and visualizing it all in a demo. I ended up landing on a combination of structs and procedures that worked well, utilizing no standard library. 
